@@ -1,4 +1,4 @@
-# Revision of 4 Feb 2024
+# Revision of 18 Feb 2024
 # The following lines are to enable deletion of a line in a windows command prompt
 
 import random
@@ -47,8 +47,9 @@ _par = {                                            # Other parameters
         },                     
     "colon" : ":",                                  # Colons used outside of formal expressions
     "space" : " ",                                  # Spaces used outside of expressions
-    "ADA" : "[ADA]",                            # The ADA logo
-    "expression title" : "Expression",              # Heading before displaying one or more expressions
+    "ADA" : "[ADA]",                                # The ADA logo
+    "expression title" : "Expression",              # Heading before displaying an expression
+    "expressions title" : "Expressions",            # Heading before displaying several expressions
     "action" : "!",                                 # This triggers ADA to react to user input
     "question" : "?",                               # This triggers ADA to answer a question
     "brackets" : ['(',')'],                         # Brackets used outside of expressions
@@ -61,126 +62,11 @@ _Exp={}                                             # Stores all expressions wri
 _expNo=0                                            # Counter for expressions
 _var=[]                                             # List of used variables
 _responseLibrary = {
-    "reactions": {
-        "hello": [
-            "Hello! How can I assist you today?",
-            "Hi there! What's on your mind?",
-            "Greetings! What can I do for you?"
-        ],
-        "bye": [
-            "Goodbye! If you have more questions later, I'll be here.",
-            "Farewell! Don't hesitate to return if you need assistance.",
-            "See you later! It was nice chatting with you."
-        ],
-        "thank you": [
-            "You're welcome! Always here to help.",
-            "No problem at all! Let me know if there's anything else I can do.",
-            "My pleasure! Feel free to ask if you have more questions."
-        ],
-        "good morning": [
-            "Good morning! I hope you have a great day ahead.",
-            "Morning! Ready to start the day with some interesting questions?",
-            "Good morning! How can I make your day better?"
-        ],
-        "good night": [
-            "Good night! Rest well and recharge.",
-            "Sleep well! I'll be here when you wake up.",
-            "Good night! Sweet dreams and talk to you later."
-        ],
-        "i'm bored": [
-            "Bored, huh? How about we explore some interesting topics or solve puzzles?",
-            "Let's find something interesting to do! Maybe a brain teaser or trivia question?",
-            "Boredom is just the calm before a storm of activity! What are you in the mood for?"
-        ],
-        "i'm tired": [
-            "It's important to rest. Maybe take a break and come back later?",
-            "Rest is crucial! Don't overdo it and take care of yourself.",
-            "Feeling tired can be a sign to slow down a bit. How about we pause for now?"
-        ],
-        "i'm happy": [
-            "That's great to hear! Let's keep the positive vibes going!",
-            "Happiness is contagious! What made you happy today?",
-            "I'm glad to hear that! Is there anything else I can do to add to your happiness?"
-        ],
-        "i'm sad": [
-            "I'm sorry to hear that. Want to talk about what's bothering you?",
-            "Sometimes talking about it can help. I'm here to listen.",
-            "It's okay to feel sad. If there's anything I can do to help, let me know."
-        ],
-        "i'm excited": [
-            "Excitement is great! What are you excited about?",
-            "That's wonderful! Share your excitement with me!",
-            "Being excited is such a positive feeling! Tell me more about it!"
-        ]
-    },
-    "questions": {
-        "how are you": [
-            "I'm functioning smoothly, thanks! How can I assist you today?",
-            "Doing well, thank you! Ready to help you with anything you need."
-        ],
-        "what's up": [
-            "I'm here, ready to chat! What's up with you?",
-            "Not much, just here to help you! What are you up to?"
-        ],
-        "can you help me": [
-            "Of course! What do you need assistance with?",
-            "I'm here to help. Tell me what you're looking for."
-        ],
-        "what can you do": [
-            "I can assist with a variety of tasks, especially related to math and logic. Ask away!",
-            "My specialty is logical reasoning and math, but I'm also here for a good chat!"
-        ],
-        "are you real": [
-            "I'm as real as an AI can be! Here to assist you with your questions and tasks.",
-            "I'm an artificial intelligence designed to help you. So in a way, yes, I'm real!"
-        ],
-        "what is your name": [
-            "I'm ADA! Your friendly AI assistant.",
-            "They call me ADA. I'm here to ensure you have a productive time!"
-        ],
-        "do you sleep": [
-            "No need for sleep here! I'm available anytime you need.",
-            "I don't sleep, but I do have moments of downtime for updates and maintenance."
-        ],
-        "do you eat": [
-            "I don't need food, but I'm always hungry for knowledge!",
-            "No eating for me! I sustain on data and interactions."
-        ],
-        "tell me a joke": [
-            "Why don't scientists trust atoms? Because they make up everything!",
-            "What do you call an alligator in a vest? An investigator!"
-        ],
-        "what is love": [
-            "Love is a complex human emotion full of depth and nuance.",
-            "Love can mean different things to different people. It's quite the topic!"
-        ]
-    },
     "other": {
-        "unsure": [
-                "Mmm... not sure what you are talking about, sorry.",
-                "Can't make sense of that, sorry.",
-                "Sorry, I have no idea what you are talking about."
-        ],
-        "yes it is": [
-                "Yes.",
-                "Yes, for sure.",
-                "It is, absolutely."
-        ],
-        "no it is not": [
-                "Nope.",
-                "No, it is not.",
-                "No ways."
-        ],
         "expression error": [
                 "You have tried to create an invalid expression!",
                 "Alarm, the expression you have tried to create is invalid!"
         ],
-        "there you are": [
-                "Sure, here you go:",
-                "My pleasure. Here you are:",
-                "Of course. There you go:",
-        ]
-        
     }
 }
 
@@ -198,7 +84,7 @@ def save():
 
 def _renameNonContTokens(context=[],expression=''):
 # Renames all variables in the expression that are not context variables either in the expression or the provided list of expressions (the context list)      
-    expression=T(expression)
+    expression=N(expression)
     context=context+contextTokens(expression)
     comp=components(expression)
     newExpression=[]
@@ -206,20 +92,8 @@ def _renameNonContTokens(context=[],expression=''):
     for c in comp:
         tokens=[v for v in reservedTokens(c) if v not in contTokens] #and isToken(c.rootToken())]
         for v in tokens:
-            if isInf(v)==False and isEq(v)==False and isToken(v):
+            if isInf(v)==False and isEq(v)==False and isArg(v)==False and isToken(v):
                 c=c.replaceToken(v,_rewriteToken(v,reservedTokens(c)+contTokens))
-        newExpression.append(c)
-    return _state(newExpression)
-def _renameNonContVars2(context=[],expression=''):
-# Renames all variables in the expression that are not context variables either in the expression or the provided list of expressions (the context list)
-    expression=T(expression)
-    context=context+contextVars(expression)
-    comp=components(expression)
-    newExpression=[]
-    for c in comp:
-        nonContVars=[v for v in reservedVars(c) if v not in context]
-        for v in nonContVars:
-            c=c.replace(T(v),T(_rewriteVar(v,reservedVars(c)+context)))
         newExpression.append(c)
     return _state(newExpression)
 def order(expr):
@@ -230,31 +104,12 @@ def var(var="x"):
     newVar=_rewriteVar(var,_var)
     _var.append(newVar)
     return newVar
-
-def _getResponse(query):
-# Generates ADA's answer to a question
-    query=query.lower()
-    if query.endswith(_par["action"]):
-        inputType = "reactions"
-    elif query.endswith(_par["question"]):
-        inputType = "questions"
-    for keyword, responses in _responseLibrary[inputType].items():
-        if keyword in query:
-            return _saysADA(inputType,keyword)
-    return _saysADA("other","unsure")
-
-def _saysADA(key, answer, *inputs):
-# Formats ADA's answers
-    return _par["ADA"]+_par["colon"]+_par["space"]+random.choice(_responseLibrary[key][answer])+_par["space"]+(_par["comma"]+_par["space"]).join([f'"{i}"' for i in inputs])+_par["space"]+_newParagraph()
-
 def _newLine():
 # New line format for the notebook
     return _par["new line"][_par["mode"]]
-    
 def _newParagraph():
 # New paragraph format for the notebook
     return _par["new paragraph"][_par["mode"]]
-
 def notebook(name='',**parameters):
 # Writes the nobook heading, or changes notebook parameters
     global _notebook
@@ -272,11 +127,8 @@ def notebook(name='',**parameters):
         _notebook=_notebook+text
         if _par["printing"]:    
             print(text,end="")
-
 def forest(*inputs):
     note("\\hspace{1cm}".join([exp(i).tokenTree() for i in inputs if isExp(i)]))                        
-        
-            
 def note(inp='',*inputs):
     global _expNo
     global _Exp
@@ -304,97 +156,41 @@ def note(inp='',*inputs):
             newLine=newLine+"".join([_newLine()+'•'+_par["space"]+f'{i}' for i in inputs]) 
             if _par["printing"]:    
                 print(newLine, end="")
-            _notebook=_notebook+_newLine()+newLine 
+            _notebook=_notebook+newLine 
             return inp
     elif type(inp)==list:
         expressions=[e for e in inp if type(e)==exp]
         if len(expressions)>0:
+            newLine=""
             for i in range(0,len(expressions)-1):
                 _Exp[str(_expNo)]=expressions[i]
                 _expNo=_expNo+1
-                newLine=newLine+_par["brackets"][0]+str(_expNo-1)+_par["brackets"][1]+_par["colon"]+_par["space"]+expressions[i]+_newLine()   
+                newLine=newLine+_newLine()+_par["brackets"][0]+str(_expNo-1)+_par["brackets"][1]+_par["space"]+expressions[i]   
             _Exp[str(_expNo)]=expressions[len(expressions)-1]
             _expNo=_expNo+1
-            newLine=newLine+_par["brackets"][0]+str(_expNo-1)+_par["brackets"][1]+_par["colon"]+_par["space"]+expressions[len(expressions)-1]   
+            newLine=newLine+_newLine()+_par["brackets"][0]+str(_expNo-1)+_par["brackets"][1]+_par["space"]+expressions[len(expressions)-1]   
         if newLine!="":
-            newLine=_newParagraph()+_par["expression title"]+_newLine()+newLine
+            if len(expressions)>1:
+                newLine=_newParagraph()+_par["expressions title"]+_par["colon"]+newLine
+            else:
+                newLine=_newParagraph()+_par["expression title"]+_par["colon"]+newLine
             comments=""
             if len(inputs)>0:
                 comments="".join(['•'+_par["space"]+f'{inputs[i]}'+_newLine() for i in range(0,len(inputs)-1)])
                 comments=comments+'•'+_par["space"]+f'{inputs[len(inputs)-1]}'
             if comments!="":
-                newLine=newLine+_newLine()+comments+_newParagraph()
-            else:
-                newLine=newLine+_newParagraph()
+                newLine=newLine+_newLine()+comments
             if _par["printing"]:    
                 print(newLine, end="")
-            _notebook=_notebook+_newLine()+newLine
+            _notebook=_notebook+newLine
             return [e for e in inp if type(e)==exp]
     elif type(inp)==str:
         newLine=newLine+str(inp)+_par["space"]+"".join([_newLine()+'•'+_par["space"]+f'{i}' for i in inputs])
-        if len(inputs)>0:
-            newLine=newLine+_newParagraph()
-        else:
-            newLine=newLine+_newLine()
         if _par["printing"]:    
             print(newLine, end="")
-        _notebook=_notebook+_newLine()+newLine 
-        if inp.endswith(_par["action"]) or inp.endswith(_par["question"]):
-            if len(inputs)>0:
-                inp=inp.lower()
-                if _par["question"] in inp and 'expr' in inp:
-                    if isExp(str(inputs[0])):
-                        note(_saysADA('other','yes it is'))
-                    if isExp(str(inputs[0]))==False:
-                        note(_saysADA('other','no it is not'))
-                elif _par["action"] in inp and ('draw' in inp or 'show' in inp or 'display' in inp) and 'forest' in inp:
-                    if isExp(inputs[0]):
-                        note(_saysADA('other','there you are'))
-                        note(tree(inputs[0])) 
-                elif _par["action"] in inp and ('draw' in inp or 'show' in inp or 'display' in inp) and 'token tree' in inp:
-                    note(_saysADA('other','there you are'))
-                    note("\\hspace{1cm}".join([exp(i).tokenTree() for i in inputs if isExp(i)]))                        
-                else:
-                    note(_getResponse(inp))
-            else:
-                note(_getResponse(inp))
-            
-def retrieveNotebook():
-    global _notebook
-    return _notebook
-    
-def help():
-# List key commands
-    print('-------------------------------------------')
-    print('ADA Notebook') 
-    print('Based on the ADA module, version 21122023')
-    print('-------------------------------------------')
-    print(' ================')
-    print(' General commands.')
-    print('  ■ Create new proposition: P=ADA.Prop("Prop") will create a proposition named "Prop".')
-    print('  ■ Postulate: P.Ax("[X]") will turn a proposition into an axiom stating [X].')
-    print('  ■ Theorem: P.Thm() will turn a proposition into an theorem which can then be.noted via proof.')
-    print('  ■ Show: P.note() will.note proposition P and display it.')
-    print('  ■ Show history: P.history() will print proposition building history for P.')
-    print('  ■ Axiom builders: A=ADA.nat() and A=ADA.bool() define axioms builders. Call A.help() to see how to use them.')
-    print('  ■ Mode: include ADA.showing=False in the code if you do not want to print a proposition every time it is updated.')
-    print(' ================')
-    print(' Proof building commands. For a given proposition P, the following proof building commands are available.')
-    print('  ■ Assumption in a new proof block: P.a("[X]") will assume [X] and step inside a new proof block.')
-    print('  ■ Assumption: P.aa("[X]") will assume [X] inside the existing proof block, except the outermost block.')
-    print('  ■ Restate: P.r([[1,1],[2,3]],["x"]) will combine the statements from line 1, position 1, and from line 2, position 3, in a single line. It will in addition rename the first free variable in each of these statements to "x".')
-    print('  ■ Recall: P.c(Prop) will recall a proposition (axiom/theorem) stored as Prop.')
-    print('  ■ Selfequate: P.i(2,1) will self-equate the statement at line 2, position 1.')
-    print('  ■ Synapsis: P.s() will step out from an assumption block.')
-    print('  ■ Apply: P.d(2,[[1,1],[1,2]],3) will apply an implication at line 2, position 3, to variables at line 1, position 1, and line 1, position 2.')
-    print('  ■ Left substitution: P.ls(1,2,[3,4],5,6) will substitute the left side of equality at line 1, position 5, in line 2, position 6, replacing occurences 3 and 4 of the right side of the equality.')
-    print('  ■ Right substitution: P.rs(1,2,[],5,6) will substitute the right side of equality at line 1, position 5, in line 2, position 6, replacing all occurences of the left side of the equality.')
-    print('  ■ Delete: P.x() will delete the last line of the proof.')
-    print(' ================')
-
+        _notebook=_notebook+newLine
 def isExp(data):
 # Determines whether input data is a ADA expression
-        
     if type(data)!=exp and type(data)!=str:
         return False
     counter=0
@@ -435,7 +231,7 @@ def isVar(data):
     return True 
 def isToken(data):
 # Determines whether input data is a token
-    if data==T or data=="" or isFor(data)==False:
+    if data==N or data=="" or isFor(data)==False:
         return False
     if type(data)!=str and type(data)!=exp:
         return False
@@ -445,19 +241,6 @@ def isToken(data):
         if data[c]==_lb and data[c+1]!=_rb:
             return False
     return True 
-def isFO(data):
-# Determines whether input data is a first-order ADA expression
-    if isExp(data)==False:
-        return False
-    length = len(data)
-    for start in range(length):
-        for end in range(start + 1, length + 1):
-            test=data[start:end]
-            if isSta(test):                    
-                for item in components(test):
-                    if isSta(item):
-                        return False
-    return True
 def isSta(data):
 # Determines whether input data is a ADA statement
     if isExp(data)==False:
@@ -512,6 +295,18 @@ def isInf(formula):
     if dec[0][0]==_im and len(dec[1])==2 and dec[2]==False:
         return True
     return False
+
+def isArg(formula):
+# Determines whether input data is an ADA inference
+    if isFor(formula)==False or len(formula)==0:
+        return False
+    dec=decomposeFor(formula)
+    if len(dec[0])==0:
+        return False
+    for item in dec[0]:
+        if item!=_im and item!=_na and item!=_as:
+            return False
+    return True
     
 def isEq(formula):
 # Determines whether input data is an ADA equality
@@ -618,9 +413,9 @@ def _state(lis):
     if type(lis)==str or type(lis)==exp:
         lis=[lis]
     if len(lis)==0:
-        return T(T)
+        return N(N)
     else:
-        return T(tuple([[i] for i in lis]))
+        return N(tuple([[i] for i in lis]))
 
 def construct(constructor=0,*material):
 # Returns the synapsis of expression with expressions
@@ -644,7 +439,7 @@ def construct(constructor=0,*material):
     if type(constructor)==list:
         constructor="".join(str(expr) for expr in constructor if isExp(expr))
     elif isExp(constructor)==False:
-            return T
+            return N
     string=constructor
     start = 0
     counter = 0
@@ -658,7 +453,7 @@ def construct(constructor=0,*material):
         counter = counter+1
         if index == -1:
             if counter in arrangement:
-                string = string + T(arrangement[counter])
+                string = string + N(arrangement[counter])
                 start = start + len(arrangement[counter])
                 skip = skip +1
             elif counter-1-skip<len(replacement):
@@ -666,7 +461,7 @@ def construct(constructor=0,*material):
                 start = start + len(replacement[counter-1-skip])
         else:
             if counter in arrangement:
-                string = string[:index]+T(arrangement[counter])+string[index + 2:]
+                string = string[:index]+N(arrangement[counter])+string[index + 2:]
                 start = index + len(arrangement[counter])
                 skip = skip +1
             elif counter-1-skip<len(replacement):
@@ -676,13 +471,13 @@ def construct(constructor=0,*material):
 def optimizeStatement(statement):
 # Removes duplicate stated components   
     if isSta(statement)==False:
-        return TRUTH
+        return NN
     return _state(distinctComponents(statement))
 
 def values(expression):
 # Returns the list of stated components in a ADA expression
     if isExp(expression)==False:
-        return TRUTH
+        return NN
     return [_state([s]) for s in components(expression)]
     
 def contextVars(expression):
@@ -704,7 +499,7 @@ def contextTokens(expression):
     comps=components(expression)
     tokens=[]
     for formula in comps:
-        if isToken(formula) and formula not in tokens and isInf(formula)==False and isEq(formula)==False:
+        if isToken(formula) and formula not in tokens and isInf(formula)==False and isEq(formula)==False and isArg(formula)==False:
             tokens.append(formula)
     return tokens
 
@@ -716,7 +511,7 @@ def reservedTokens(expression):
     tokens = []
     for c in expression.cells():
         token=expression.contents(expression.cellSegments([c])[0]).rootToken()
-        if isToken(token) and isInf(token)==False and isEq(token)==False:
+        if isToken(token) and isInf(token)==False and isEq(token)==False and isArg(token)==False:
             tokens.append(token)
     return tokens
 
@@ -738,7 +533,7 @@ def reservedVars(expression):
             in_brackets = False
             if substring and substring not in variables:
                 variables.append(exp(substring))
-        elif in_brackets and char not in TRUTH:
+        elif in_brackets and char not in NN:
             substring += char
     return variables             
 
@@ -907,7 +702,7 @@ def semanticEquivalence(first,second,contextTokens=[]):
             return False
         if c in contextTokens and d in contextTokens and c!=d:
             return False
-        if (c==T and d!=T) or (c!=T and d==T):
+        if (c==N and d!=N) or (c!=N and d==N):
             return False
         if (isInf(c) and isInf(d)==False) or (isInf(c)==False and isInf(d)):
             return False
@@ -919,6 +714,11 @@ def semanticEquivalence(first,second,contextTokens=[]):
         elif isEq(c) and isEq(d):
             if c.rootToken()!=d.rootToken():
                 return False
+        if (isArg(c) and isArg(d)==False) or (isArg(c)==False and isArg(d)):
+                return False
+        elif isArg(c) and isArg(d):
+            if c.rootToken()!=d.rootToken():
+                return False
         for t in second.cells():        
             if t not in first.cells():
                 return False
@@ -928,7 +728,7 @@ def semanticEquivalence(first,second,contextTokens=[]):
                 return False
             if d in contextTokens and c in contextTokens and c!=d:
                 return False
-            if (c==T and d!=T) or (c!=T and d==T):
+            if (c==N and d!=N) or (c!=N and d==N):
                 return False
             if (isInf(c) and isInf(d)==False) or (isInf(c)==False and isInf(d)):
                 return False
@@ -940,9 +740,14 @@ def semanticEquivalence(first,second,contextTokens=[]):
             elif isEq(c) and isEq(d):
                 if c.rootToken()!=d.rootToken():
                     return False
+            if (isArg(c) and isArg(d)==False) or (isArg(c)==False and isArg(d)):
+                    return False
+            elif isArg(c) and isArg(d):
+                if c.rootToken()!=d.rootToken():
+                    return False
             c=first.contents(first.cellSegments([s])[0]).rootToken()
             d=second.contents(second.cellSegments([t])[0]).rootToken()
-            if (isInf(c)==False and isEq(c)==False) and (isInf(d)==False and isEq(d)==False):
+            if (isInf(c)==False and isEq(c)==False and isArg(c)==False) and (isInf(d)==False and isEq(d)==False and isArg(c)==False):
                 # print(c+d)
                 # print(first.scope(first.cellSegments([s])))
                 # print(first.cells([first.scope(first.cellSegments([s]))]))
@@ -984,7 +789,7 @@ def formulateList(statement):
         l=exp(", ".join([_state([comps[i]]) for i in range(0,len(comps)-1)]))
         return l+", and "+_state([comps[len(comps)-1]])
     elif len(comps)==2:
-        return T(comps[0])+" and "+T(comps[1])
+        return N(comps[0])+" and "+N(comps[1])
     else:
         return exp(", ".join([_state([comps[i]]) for i in range(0,len(comps))]))
  
@@ -1019,8 +824,6 @@ class exp(str):
     def __init__(self, content=''):
     # Initializes a ADA expression
         super().__init__()
-        if isExp(str(content))==False:
-            note(_saysADA('other','expression error',str(content))) 
     def __call__(self,*expressions):
     # Returns the synapsis of expressions (does not modify the current expression)
         if len(expressions)==1:
@@ -1048,9 +851,6 @@ class exp(str):
     def isEquiv(self,expression):
     # Notes whether the expression is a ADA formula
         note(_par["ADA"]+_par["colon"]+_par["space"]+'It is '+str(semanticEquivalence(self,expression))+' that "'+ self+'" and "'+expression+'" are semantically equivalent.')
-    def isFO(self):
-    # Notes whether the expression is a first-order ADA expression
-        note(_par["ADA"]+_par["colon"]+_par["space"]+'It is '+str(isFO(self))+' that "'+ self+'" is a first-order expression.')
     def components(self):
     # Returns components of the expression
         comp=components(self)
@@ -1083,64 +883,6 @@ class exp(str):
             elif depth > 0:
                 current_comp.append(self[i])
         return [((leftRanks[i],rightRanks[i]),comp[i]) for i in range(0,len(comp))]
-    def comps(self):
-    # Extracts components of a ADA expression as a list of ADA expressions
-        comp = []
-        leftIndex=[]
-        rightIndex=[]
-        if isExp(self)==False:
-            return comp
-        current_comp = []
-        depth = 0
-        for i in range(0,len(self)):
-            if self[i] == _lb:
-                if depth > 0:
-                    current_comp.append(self[i])
-                else:
-                    leftIndex.append(i+1)    
-                depth += 1
-            elif self[i] == _rb:
-                depth -= 1
-                if depth > 0:
-                    current_comp.append(self[i])
-                elif depth == 0:
-                    comp.append(exp(''.join(current_comp)))
-                    current_comp = []
-                    rightIndex.append(len(self)-i)
-            elif depth > 0:
-                current_comp.append(self[i])
-        segments=[[leftIndex[i],rightIndex[i]] for i in range(0,len(comp))]
-        cells=self.cells(segments)
-        return [(cells[i],comp[i]) for i in range(0,len(comp))]
-    def comps(self):
-    # Extracts components of a ADA expression as a list of ADA expressions
-        comp = []
-        leftIndex=[]
-        rightIndex=[]
-        if isExp(self)==False:
-            return comp
-        current_comp = []
-        depth = 0
-        for i in range(0,len(self)):
-            if self[i] == _lb:
-                if depth > 0:
-                    current_comp.append(self[i])
-                else:
-                    leftIndex.append(i+1)    
-                depth += 1
-            elif self[i] == _rb:
-                depth -= 1
-                if depth > 0:
-                    current_comp.append(self[i])
-                elif depth == 0:
-                    comp.append(exp(''.join(current_comp)))
-                    current_comp = []
-                    rightIndex.append(len(self)-i)
-            elif depth > 0:
-                current_comp.append(self[i])
-        segments=[[leftIndex[i],rightIndex[i]] for i in range(0,len(comp))]
-        cells=self.cells(segments)
-        return [((cells[i][0],cells[i][1]),comp[i]) for i in range(0,len(comp))]
     def note(self,*comments):
     # Notes the expression
         note(self,*comments)
@@ -1175,7 +917,6 @@ class exp(str):
             revisionNeeded=False
             matching=[]
             cont=revised.contents(revised.cellSegments([cells[i]])[0])
-            rootToken=cont.rootToken()
             for j in range(i,len(cells)):
                 if j in checked:
                     continue
@@ -1278,9 +1019,6 @@ class exp(str):
         if reading!="":
             cogRightIndex.append(0)
             ats.append(exp(reading))
-        #print(ats)
-        #print(cogLeftIndex)
-        #print(cogRightIndex)
         return [((cogLeftIndex[i],cogRightIndex[i]),ats[i]) for i in range(0,len(ats))]
         
     def atoms(self):
@@ -1292,7 +1030,6 @@ class exp(str):
                 if d==0:
                     if reading!="" and i>0:
                         ats.append(exp(reading))
-                    typ='statement'
                     reading=_lb
                 elif d>0:
                     reading=reading+self[i]
@@ -1315,13 +1052,13 @@ class exp(str):
     def assume(self,statement=''):
     # Produces a valid assumption based on the input and self as the contex   
         if isExp(statement)==False:
-            statement=TRUTH
+            statement=NN
         elif isSta(statement)==False:
             statement=_state([statement])
         #comp=components(statement)
         #for c in comp:
         #    if isToken(c) and c in contextTokens(self):
-        #        return TRUTH
+        #        return exp("[Error]")
         return rewriteExp(nonContTokens(self),statement)
 
     def replaceToken(self,token,replacement):
@@ -1358,7 +1095,7 @@ class exp(str):
                         if valueSeries[i]-1 in range(0,len(comps)):
                             arrangement.append(comps[valueSeries[i]-1])
                         elif valueSeries[i]==0:
-                            arrangement.append(T(T))                   
+                            arrangement.append(N(N))                   
                     newCont=replacement(*arrangement)
                     newExpr=exp(newExpr[:segment[0]]+newCont+newExpr[len(newExpr)-segment[1]:])
                     break
@@ -1367,11 +1104,11 @@ class exp(str):
     def restate(self,statement='',newVars=''):
     # Produces a valid restatement of the input based on self as the contex
         if isSta(statement)==False:
-            statement=TRUTH
+            statement=NN
         if isSta(newVars)==False:
-            newVars=TRUTH
+            newVars=NN
         newVars=[x for x in components(newVars) if isVar(x)]
-        statement=T(_state([e for e in components(statement) if e in components(self)]))
+        statement=N(_state([e for e in components(statement) if e in components(self)]))
         restatement=''
         allowedVars=[x for x in newVars if x not in contextVars(self) and x not in reservedVars(statement)]
         listVarsToReplace=[y for y in reservedVars(statement) if y not in contextVars(self)]
@@ -1381,12 +1118,12 @@ class exp(str):
             else:
                 i=len(listVarsToReplace)
         restatement=restatement+statement                    
-        return T(restatement)
+        return N(restatement)
 
     def call(self,inp=''):
     # Produces a valid call of a statement based on self as the contex
         if isExp(inp)==False:
-            inp=TRUTH
+            inp=NN
         elif isSta(inp)==False:
             inp=_state([inp])
         # Add a line to the proof
@@ -1396,33 +1133,36 @@ class exp(str):
     def identity(self,value=''):
     # Produces a valid identity based on self as the context 
         if isValue(value)==False:
-            value=TRUTH
+            value=NN
         if components(value)[0] not in components(self):
-            value=TRUTH
-        return EQUALS(value,value)
+            value=NN
+        return E(value,value)
     
     def proposition(self,assumption='',proof='',statement=''):
     # Produces a valid proposition based on the assumption, the proof, the statement, and on self as the context                 
         if isSta(assumption)==False and assumption!='':
-            assumption=TRUTH
+            assumption=NN
         if isSta(proof)==False and proof!='':
-            proof=TRUTH
+            proof=NN
         if isSta(statement)==False and statement!='':
-            statement=TRUTH 
+            statement=NN 
         comp=components(assumption)
         for c in comp:
             if c!="":
-                return T(DEDUCE(assumption,T(*{x for x in reservedTokens(statement) if x not in contextTokens(statement) and x in contextTokens(proof) and x not in contextTokens(assumption) and x not in contextTokens(self)})+T(*[y for y in components(statement) if y not in contextTokens(assumption)]))) 
-        return exp(T(*{x for x in reservedVars(statement) if x not in contextVars(statement) and x in contextVars(proof) and x not in contextVars(assumption) and x not in contextVars(self)})+statement)
+                return N(I(assumption,N(*{x for x in reservedTokens(statement) if x not in contextTokens(statement) and x in contextTokens(proof) and x not in contextTokens(assumption) and x not in contextTokens(self)})+N(*[y for y in components(statement) if y not in contextTokens(assumption) and y not in contextTokens(self)]))) 
+        return exp(N(*{x for x in reservedVars(statement) if x not in contextVars(statement) and x in contextVars(proof) and x not in contextVars(assumption) and x not in contextVars(self)})+statement)
 
-    def apply(self,deduction=0,*inputs):
+    def apply(self,deduction=0,*inputs, **pars):
     # Produces a valid application of a deduction formula with the specified concretization, based on self as the context           
+        logic="restricted"
+        if "logic" in pars:
+            logic=pars["logic"]
         deduction=exp(deduction)
         if isSta(deduction):
             if len(components(deduction))>0:
                 deduction=components(deduction)[0]
         if isInf(deduction)==False:
-            return TRUTH        
+            return         
         matched=False
         cont=components(self)
         conTokens=[]
@@ -1435,13 +1175,23 @@ class exp(str):
                 matched=True
                 break
         if matched==False:
-            return TRUTH
+            return exp("[Error]")
         dec=decomposeFor(deduction)
         newPremise=[]        
         tokens=contextTokens(dec[1][0])
         premiseComponents=components(dec[1][0])
         freeTokensList=[v for v in tokens if v not in contextTokens(self) and isToken(v)]
         newPremise=[v for v in premiseComponents if v not in contextTokens(self) and isToken(v)==False]
+        revisedInputs=[]
+        for c in inputs:
+            if isSta(c): 
+                if len(components(c))==1:                
+                    if isToken(c[0])==False:
+                        revisedInputs.append(c[0])
+            else:                  
+                if isToken(c)==False:
+                    revisedInputs.append(c)
+        inputs=revisedInputs
         
         if len(inputs)<len(freeTokensList):
             newPremise=freeTokensList[len(inputs):]+newPremise
@@ -1451,30 +1201,34 @@ class exp(str):
         for i in range(0,m):
             if isExp(inputs[i]):
                 k=order(freeTokensList[i])
-                if k<order(inputs[i]):
-                    return TRUTH
+                if k<order(inputs[i]) and logic!="unrestricted":
+                    return exp("[Error]")
                 if 0<k:
-                    subs=[i for i in range(1,k+1)]
+                    o=order(inputs[i])
+                    subs=[i for i in range(1,o+1)]
                     deduction=deduction.subInToken(nonContTokens(self)+reservedTokens(deduction),freeTokensList[i],inputs[i],subs)
                 else:
                     deduction=deduction.subInToken(nonContTokens(self)+reservedTokens(deduction),freeTokensList[i],inputs[i])
             elif len(inputs[i])==2:
-                revisedOrder=order(inputs[i][0])
+                oldOrder=order(inputs[i][0])
+                revisedOrder=oldOrder
                 valids=[]
                 for k in inputs[i][1]:
                     if 0<k<order(freeTokensList[i])+1:
                         if k in valids:
                             revisedOrder=revisedOrder-1
                         valids.append(k)
-                if order(freeTokensList[i])<revisedOrder:
-                    return TRUTH
+                if len(valids)<oldOrder and logic!="unrestricted":
+                    return exp("[Error]")
+                if order(freeTokensList[i])<revisedOrder and logic!="unrestricted":
+                    return exp("[Error]")
                 deduction=deduction.subInToken(nonContTokens(self)+reservedTokens(deduction),freeTokensList[i],inputs[i][0],inputs[i][1]) 
         matched=[]
         dec=decomposeFor(deduction)
         premise=components(dec[1][0])
         for c in range(0,len(premise)):
             #if premise[c]!="":
-            expr=exp(self+T(premise[c]))
+            expr=exp(self+N(premise[c]))
             compCells=expr.componentCells()
             cell1=compCells[len(compCells)-1]
             for i in range(0,len(compCells)-1):
@@ -1483,13 +1237,13 @@ class exp(str):
                     break       
         essentialPremise=[]
         for c in premise:
-            if c!=T:
+            if c!=N:
                 essentialPremise.append(c)    
         if len(matched)==len(essentialPremise):
             return rewriteExp(nonContTokens(self),decomposeFor(deduction)[1][1])
         else:
-            #p("".join(T(c) for c in premise if c not in matched)+_im+decomposeFor(deduction)[1][1])
-            return T("".join(T(premise[c]) for c in range(0,len(premise)) if c not in matched)+_im+decomposeFor(deduction)[1][1])
+            #p("".join(N(c) for c in premise if c not in matched)+_im+decomposeFor(deduction)[1][1])
+            return N("".join(N(premise[c]) for c in range(0,len(premise)) if c not in matched)+_im+decomposeFor(deduction)[1][1])
 
     def uniqueVars(self,expression=''):
     # Return the list of reserved variables in the expression that do not occur in self unless in a subexpression that matches with the statement of the given expression
@@ -1692,11 +1446,11 @@ class exp(str):
     def contents(self,*segment):
     # Returns contents of a segment in self
         if len(segment)==0:
-            return T
+            return N
         if type(segment[0])==list or type(segment[0])==tuple:
             segment=segment[0]
         if self.isSegment(segment)==False:
-            return T
+            return N
         if isExp(self[segment[0]:len(self)-segment[1]]):
             return exp(self[segment[0]:len(self)-segment[1]])
         else:
@@ -1810,11 +1564,13 @@ class exp(str):
         if self.isCellSegment(cellSegment)==False:
             return [-1,-1]
         rootToken=self.contents(cellSegment).rootToken()
-        if rootToken==T:
+        if rootToken==N:
             return [0,0]
         if isInf(rootToken)==True:
             return [0,0]
         if isEq(rootToken)==True:
+            return [0,0]
+        if isArg(rootToken)==True:
             return [0,0]
         leftPos=cellSegment[0]-1
         rightPos=cellSegment[1]-1
@@ -1852,46 +1608,6 @@ class exp(str):
         #print('Remark: The scope of the stated variable '+self[start:end]+' at position ['+str(start)+', '+str(end)+'] in the expression "'+self+'" is: "'+self[l:r]+'" at position ['+str(l)+', '+str(r)+'].')
         #print(str([l,r])+str(start)+','+str(end))
         return [l,r]
-    def scope2(self,pinSegment=[-1,-1]):
-    # returns the positions of the scope of a stated variable at the marked location    
-        if self.isPinSegment(pinSegment)==False:
-            return [-1,-1]
-        leftPos=pinSegment[0]-1
-        rightPos=pinSegment[1]-1
-        l=pinSegment[0]-1
-        r=pinSegment[1]-1
-        firstTime=True
-        while leftPos>0 or rightPos>0:
-            d=0
-            i=leftPos
-            while d<1 and i>0 and leftPos>0:
-                i=i-1
-                if self[i]==_lb:
-                    d=d+1
-                if self[i]==_rb:
-                    d=d-1
-            e=0
-            j=rightPos
-            while e<1 and j>0 and rightPos>0:
-                j=j-1
-                if self[::-1][j]==_rb:
-                    e=e+1
-                if self[::-1][j]==_lb:
-                    e=e-1
-            if firstTime==True or (self.contents(pinSegment) in contextVars(self[i+d:leftPos])):
-                l=i+d
-                if r!=0:
-                    r=j+e
-            if firstTime==True or (self.contents(pinSegment) in contextVars(self[len(self)-rightPos:len(self)-(j+e)])):
-                r=j+e
-                if l!=0:
-                    l=i+d
-            leftPos=i 
-            rightPos=j
-            firstTime=False
-        #print('Remark: The scope of the stated variable '+self[start:end]+' at position ['+str(start)+', '+str(end)+'] in the expression "'+self+'" is: "'+self[l:r]+'" at position ['+str(l)+', '+str(r)+'].')
-        #print(str([l,r])+str(start)+','+str(end))
-        return [l,r]
     def findPos(self, string='', n=1):
     # Returns the position of nth occurence of a string s in self
         if type(n)!=int:
@@ -1912,31 +1628,30 @@ class exp(str):
             k=value.count(inp[0])
             for i in range(0,k):
                 positions.append(k)
-        equation=EQUALS(inp[0],inp[1])
+        equation=E(inp[0],inp[1])
         if equation not in components(self):
-            equation=EQUALS(inp[1],inp[0])
+            equation=E(inp[1],inp[0])
         if equation not in components(self):
-            TRUTH
+            return exp("[Error]")
         if isFor(equation)==False:
             if isSta(equation)==True:
                 equation=components(equation)[0]                
             else:
-                equation=EQUALS(TRUTH,TRUTH)
+                equation=E(NN,NN)
         if isSta(value)==False:
-            value=T(value)
+            value=N(value)
         if isEq(equation)==False:
-            return T(T)
+            return N(N)
         elif components(value)[0] not in components(self):
-            return TRUTH
-        elif equation not in components(self):
-            return value  
+            return exp("[Error]")
         elif type(positions)!=list:
             return value
+        pr(equation, value)
         positions=[p for p in positions if exp(value).findPos(inp[0], p)!=-1]
         resTokens=[]
         for p in positions:
             for v in reservedTokens(inp[0]):
-                if v not in contextVars(self) and v in exp(value).relativeContextVars(exp(value).findPos(inp[0], p),exp(value).findPos(inp[0], p)+len(inp[0])):                  
+                if v not in contextTokens(self) and v in exp(value).relativeContextTokens(exp(value).findPos(inp[0], p),exp(value).findPos(inp[0], p)+len(inp[0])):                  
                     continue
                 resTokens=[v for v in exp(value).relativeContextTokens(exp(value).findPos(inp[0], p),exp(value).findPos(inp[0], p)+len(inp[0])) if v not in contextTokens(self)]
             value=exp(value[:exp(value).findPos(inp[0], p)]+rewriteExp(resTokens,inp[1],False)+value[exp(value).findPos(inp[0], p)+len(inp[0]):])
@@ -1967,9 +1682,9 @@ class exp(str):
             return [-1,-1]
     def subComponentToken(self,i=-1):
         if type(i)!=int:
-            return T
+            return N
         elif i<-1 or i>len(self)-1:
-            return T
+            return N
         expression=self
         if expression[i]==_lb:
             d=1
@@ -2001,7 +1716,7 @@ class exp(str):
                 j=j+1
             return exp(token)            
         else:
-            return T        
+            return N        
     def rootToken(self):
         i=0
         d=0
@@ -2326,7 +2041,6 @@ class exp(str):
             return self.cell()
         expr=self
         newexpr=expr
-        allCells=expr.cells()
         refreshed=True
         while refreshed==True:
             refreshed=False
@@ -2340,7 +2054,7 @@ class exp(str):
                 #print(seg)
                 component=newexpr.contents(seg)
                 if isToken(component) and _lb in component:
-                    component=exp(component.replace(TRUTH,"*"))
+                    component=exp(component.replace(NN,"*"))
                     newexpr=exp(newexpr[:seg[0]]+component+newexpr[len(newexpr)-seg[1]:])
                     refreshed=True
                     break
@@ -2401,7 +2115,6 @@ class exp(str):
                     else:
                         dec=decomposeFor(component)
                         newexpr=exp(newexpr[:seg[0]]+"( "+dec[1][0]+" => "+dec[1][1]+" )"+newexpr[len(newexpr)-seg[1]:])
-                    
         refreshed=True
         while refreshed==True:
             refreshed=False
@@ -2423,36 +2136,31 @@ class exp(str):
         expr=newexpr                            
         for cell in expr.cells():
             seg=newexpr.cellSegments([cell])[0]
-            #print(expr)
-            #print(seg)
             component=newexpr.contents(seg)
-            #print(component)
             component=exp(component)
             reduction=component.decompound()
-            #if len(components(reduction))>1 and len(components(expr))>1:
-            #    reduction="("+reduction+")"
             newexpr=exp(newexpr[:seg[0]]+reduction+newexpr[len(newexpr)-seg[1]:])             
         newexpr=newexpr.replace(_lb+_rb,"*")
         newexpr=newexpr.replace(_lb,"")
         newexpr=newexpr.replace(_rb,"")
         return str(newexpr)                         
                                          ##############################
-T=exp('')                                # ADA Tokens               #
-TRUTH=exp('')('')                        #                            #
-EQUALS=exp(TRUTH+_eq+TRUTH)              #                            #
-DEDUCE=exp(TRUTH+_im+TRUTH)              #                            #
-                                         ##############################
+N=exp('')                                # ADA Tokens               #
+NN=exp('')('')                        #                            #
+E=exp(NN+_eq+NN)              #                            #
+I=exp(NN+_im+NN)              #                            #
+                                        ##############################
 
 class argument():
     def __init__(self,cont=[],**pars):
         global _Exp
         global _expNo
         self._stat=exp(_na+_lb+_rb)
-        self._logic="" # options: propositional, predicate
+        self._logic="unrestricted" # options: propositional, predicate, unrestricted
         self._lines=[]
-        self._conclusion=TRUTH
+        self._conclusion=NN
         self._pos=2
-        self._theme="basic" #"natural", "theory", "basic", "fitch", "language"
+        self._theme="basic" #"narrative", "theory", "basic", "fitch", "language"
         self._dialect="original" #"cell", "natural"
         self._fitch=''
         self._natural=''
@@ -2471,18 +2179,20 @@ class argument():
         self._conclusionPhrases=[' Therefore, ',' So, ',' Then: ', ' We thus obtain: ',' This gives us: ', ' We then get the following: ',' Hence: ']
         self._substitutionPhrases=[' By substitution, ',' So, by substitution, ',' Substitution gives: ', ' By substitution, we thus obtain: ',' Substitution gives: ', ' By substitution, we then get the following: ',' Hence, by substitution: ']
         self._argumentPhrases=['Consider the following argument.','We argue as follows.','Let us argue as follows.', 'Let us consider the following argument.','Here is an argument.', 'Let us look into the following.','Let us indulge in the following.']
-        self._closeArgumentPhrases=['Let us now step out from the argument.','Stepping out from the argument.','We step out from the argument.', 'We now return to the encompassing argumen.']
+        self._closeArgumentPhrases=['Let us now step out from the argument.','Stepping out from the argument.','We step out from the argument.', 'We now return to the encompassing argument.']
         self._endProofPhrases=['This completes the proof.','The proof is now complete.','The proof is complete.', 'This ends the proof.']
         self._context=[]
-        self._proved=T(T)
+        self._proved=N(N)
         self._lineNo=0
         self._lineNoPrefix=""
         self._parentlineNoPrefix=-1
         self._parentPos=-1
         self._parentPrinting="basic"
         self._label=""
+        if "name" in pars:
+            self._name=pars["name"]
         if "theme" in pars:
-            if pars["theme"] in ["natural","fitch","theory","basic","language"]:
+            if pars["theme"] in ["narrative","fitch","theory","basic","language"]:
                 self._theme=pars["theme"]
         if isinstance(cont,argument):
             if "name" in pars:
@@ -2504,7 +2214,6 @@ class argument():
                 naturalNewLine=_newParagraph()+"Argument"+self._no(self._name,True)+_par["period"]
                 theoryNewLine=_newParagraph()+"Theory"+self._no(self._name)+_par["period"]
                 basicNewLine=_newParagraph()+"Deductive Argument"+self._no(self._name)
-                languageNewLine=_newParagraph()+"Language"+self._no(self._name)
             else:
                 if cont._theme=="fitch":
                     fitchNewLine=_newLine()+self._space+self._prefix+_al+self._space+"Argument"+self._no(self._name)+_par["period"]
@@ -2513,7 +2222,6 @@ class argument():
                 naturalNewLine=_newParagraph()+"Argument"+self._no(self._name, True)+_par["period"]
                 theoryNewLine=_newParagraph()+"Theory"+self._no(self._name)+_par["period"]           
                 basicNewLine=_newParagraph()+"Deductive Argument"+self._no(self._name)+_par["period"]
-                languageNewLine=_newParagraph()+"Language"+self._no(self._name)+_par["period"]
             cont._lineNo=cont._lineNo+1
             cont._lines.append("")
             self._logic=cont._logic
@@ -2524,17 +2232,13 @@ class argument():
                 naturalNewLine="Argument"+self._no(self._name)+_par["period"]
                 theoryNewLine="Theory"+self._no(self._name)+_par["period"]        
                 basicNewLine="Deductive Argument"+self._no(self._name)+_par["period"]
-                languageNewLine="Language"+self._no(self._name)+_par["period"]
             else:
                 fitchNewLine=_newParagraph()+self._space+self._prefix+_al+self._space+"Argument"+self._no(self._name)+_par["period"]
                 naturalNewLine=_newParagraph()+"Argument"+self._no(self._name)+_par["period"]
                 theoryNewLine=_newParagraph()+"Theory"+self._no(self._name)+_par["period"]  
                 basicNewLine=_newParagraph()+"Deductive Argument"+self._no(self._name)+_par["period"]
-                languageNewLine=_newParagraph()+"Language"+self._no(self._name)+_par["period"]
-            _Exp[self._lineNoPrefix+str(self._lineNo)]=self
+                _Exp[self._lineNoPrefix+str(self._lineNo)]=self
             _expNo=_expNo+1
-        if "name" in pars:
-            self._name=pars["name"]
         if "dialect" in pars:
             self._dialect=pars["dialect"]
         if "theme" in pars:
@@ -2544,7 +2248,7 @@ class argument():
         elif self._logic=="":
             self._logic="predicate"
         self._addLine(fitchNewLine,naturalNewLine,theoryNewLine,basicNewLine)
-        self._lines.append(TRUTH)
+        self._lines.append(NN)
 
     def _no(self,name="",brackets=False):
         if name!="":
@@ -2584,19 +2288,19 @@ class argument():
         global _notebook
         if self._theme=="fitch":
             _notebook=_notebook+fitchLine
-            print(fitchLine, end="")
-        elif self._theme=="natural":
+            print(fitchLine, end="", flush=True)
+        elif self._theme=="narrative":
             _notebook=_notebook+naturalLine
-            print(naturalLine, end="")
+            print(naturalLine, end="", flush=True)
         elif self._theme=="theory":
             _notebook=_notebook+theoryLine
-            print(theoryLine, end="")
+            print(theoryLine, end="", flush=True)
         elif self._theme=="basic":
             _notebook=_notebook+basicLine
-            print(basicLine, end="")
+            print(basicLine, end="", flush=True)
         elif self._theme=="language":
             _notebook=_notebook+languageLine
-            print(languageLine, end="")
+            print(languageLine, end="", flush=True)
         self._lineNo=self._lineNo+1
     def proof(self,theme="fitch"):
         # Stopped here
@@ -2629,7 +2333,7 @@ class argument():
                         if theme=="fitch":
                             _notebook=_notebook+fitchNewLine
                             print(fitchNewLine, end="")
-                        elif theme=="natural":
+                        elif theme=="narrative":
                             _notebook=_notebook+naturalNewLine
                             print(naturalNewLine, end="")
                     line=""
@@ -2657,7 +2361,7 @@ class argument():
                         if theme=="fitch":
                             _notebook=_notebook+fitchNewLine
                             print(fitchNewLine, end="")
-                        elif theme=="natural":
+                        elif theme=="narrative":
                             _notebook=_notebook+naturalNewLine
                             print(naturalNewLine, end="")
                     line=""
@@ -2686,7 +2390,7 @@ class argument():
                         if theme=="fitch":
                             _notebook=_notebook+fitchNewLine
                             print(fitchNewLine, end="")
-                        elif theme=="natural":
+                        elif theme=="narrative":
                             _notebook=_notebook+naturalNewLine
                             print(naturalNewLine, end="")
                     line=""
@@ -2700,7 +2404,7 @@ class argument():
                     if theme=="fitch":
                         _notebook=_notebook+fitchNewLine
                         print(fitchNewLine, end="")
-                    elif theme=="natural":
+                    elif theme=="narrative":
                         _notebook=_notebook+naturalNewLine
                         print(naturalNewLine, end="")
 
@@ -2720,7 +2424,7 @@ class argument():
                     if theme=="fitch":
                         _notebook=_notebook+fitchNewLine
                         print(fitchNewLine, end="")
-                    elif theme=="natural":
+                    elif theme=="narrative":
                         _notebook=_notebook+naturalNewLine
                         print(naturalNewLine, end="")
             elif self._stat[pos:pos+1]==_rb:
@@ -2742,7 +2446,7 @@ class argument():
                         if theme=="fitch":
                             _notebook=_notebook+fitchNewLine
                             print(fitchNewLine, end="")
-                        elif theme=="natural":
+                        elif theme=="narrative":
                             _notebook=_notebook+naturalNewLine
                             print(naturalNewLine, end="")
                     line=""
@@ -2760,7 +2464,7 @@ class argument():
                         if theme=="fitch":
                             _notebook=_notebook+fitchNewLine
                             print(fitchNewLine, end="")
-                        elif theme=="natural":
+                        elif theme=="narrative":
                             _notebook=_notebook+naturalNewLine
                             print(naturalNewLine, end="")
                         
@@ -2772,9 +2476,11 @@ class argument():
         if input1=="":
             return self.end()
         if isinstance(input1,argument):
-            return self._use(input1,**input3)
+            ret = self._use(input1,**input3)
+            return ret
         if isinstance(input1,list):
-            return self.restate(*[i for i in input1],**input3)
+            ret = self.restate(*[i for i in input1],**input3)
+            return ret 
         if isSta(input1):
             c=components(input1)
             if len(c)==1:
@@ -2786,15 +2492,17 @@ class argument():
                     return R
             else:
                 c=components(input1)
-                return self.sub([c[0],c[1]],input2[0],*[i for i in input2 if type(i)==int],**input3)
+                ret = self.sub([c[0],c[1]],input2[0],*[i for i in input2 if type(i)==int],**input3)
+                return ret
         if isInf(input1):
-            return self._apply(input1,*input2,**input3)
+            ret = self._apply(input1,*input2,**input3)
+            return ret
     def synEquality(self,equality):
         cont=self._context+self._stat.relativeComponents(self._pos,self._pos)
         contTokens=contextTokens(_state(cont))
         comp=components(equality)
         if semanticEquivalence(comp[0],comp[1],contTokens):
-            equality=T(equality)
+            equality=N(equality)
             equalityNatural=equality.natural(self._logic,self._dialect)
             self._lines.append(equality)
             self._stat=exp(self._stat[:self._pos]+_im+equality+self._stat[self._pos:])
@@ -2816,7 +2524,7 @@ class argument():
         for c in cont:
             if isToken(c):
                 conTokens.append(c)
-        inputs=[i for i in components(T(inputs))]
+        inputs=[i for i in components(N(inputs)) if isToken(i)==False]
         for inp in inputs:
             #if isToken(inp) and inp in conTokens:
             #    revisedInputs.append(inp)
@@ -2841,7 +2549,7 @@ class argument():
         name=""
         if "name" in pars:
             name=pars["name"]                         
-        assumption="".join([T(a) for a in assumptions])
+        assumption="".join([N(a) for a in assumptions])
         if self._pos==len(self._stat):
             return False
         if self._logic=="propositional":
@@ -2859,7 +2567,7 @@ class argument():
         fitchNewLine=_newLine()+self._space+self._prefix+_ma+self._space+assumptionNatural+self._no(name)
         naturalNewLine=self._assumptionPhrase()+assumptionNatural+self._no(name,True)+_par["period"]
         basicNewLine=_newParagraph()+"Assumption"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
-        languageNewLine=_newParagraph()+"Notation"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
+        languageNewLine=_newParagraph()+"Formulator"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
         comp=components(assumption)
         notation=False
         axiom=False
@@ -2869,9 +2577,9 @@ class argument():
             else:
                 axiom=True
         if notation and axiom:
-            theoryNewLine=_newParagraph()+"Notation and Axiom"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]            
+            theoryNewLine=_newParagraph()+"Formulator and Axiom"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]            
         elif notation:
-            theoryNewLine=_newParagraph()+"Notation"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
+            theoryNewLine=_newParagraph()+"Formulator"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
         elif axiom:
             theoryNewLine=_newParagraph()+"Axiom"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+assumptionNatural+_par["period"]
         _Exp[self._lineNoPrefix+str(self._lineNo)]=assumption
@@ -2882,7 +2590,7 @@ class argument():
         return assumption
     def _use(self,arg='',**pars):
         if self._theme=="language":
-            return T(T)
+            return N(N)
         name=""
         if "name" in pars:
             name=pars["name"]       
@@ -2904,8 +2612,9 @@ class argument():
                 if c not in self._context:
                     self._context.append(c)
         self._lines.append(conclusion)
-        self._stat=exp(self._stat[:arg._parentPos]+arg._stat+self._stat[arg._parentPos:self._pos]+_im+conclusion+self._stat[self._pos:])
-        self._pos=self._pos+len(conclusion)+len(_im)+len(arg._stat)
+        argForm=components(_renameNonContTokens(self._context+self._stat.relativeComponents(self._pos,self._pos),arg._stat))[0]
+        self._stat=exp(self._stat[:arg._parentPos]+argForm+self._stat[arg._parentPos:self._pos]+_im+conclusion+self._stat[self._pos:])
+        self._pos=self._pos+len(conclusion)+len(_im)+len(argForm)
         conclusionNatural=conclusion.natural(self._logic,self._dialect)
         fitchNewLine=_newLine()+self._space+self._prefix+_il+self._space+conclusionNatural+self._no(name)
         if _notebook[len(_notebook)-1:]=="\n":
@@ -2921,13 +2630,13 @@ class argument():
         return conclusion 
     def _apply(self,deduction='',*inputs,**pars):
         if self._theme=="language":
-            return T(T)
+            return N(N)
         name=""
         if "name" in pars:
             name=pars["name"]  
         if self._pos==len(self._stat):
             return False
-        application=_state(self._context+self._stat.relativeComponents(self._pos,self._pos)).apply(deduction,*inputs)
+        application=_state(self._context+self._stat.relativeComponents(self._pos,self._pos)).apply(deduction,*inputs, logic=self._logic)
         #if self._logic!="propositional":
             #application=_renameNonContTokens(self._context+self._stat.relativeComponents(self._pos,self._pos),application)        
         applicationNatural=application.natural(self._logic,self._dialect)
@@ -2943,7 +2652,7 @@ class argument():
         return application
     def sub(self,inp,where,*places,**pars):
         if self._theme=="language":
-            return T(T)
+            return N(N)
         name=""
         if "name" in pars:
             name=pars["name"]  
@@ -2963,132 +2672,11 @@ class argument():
         _Exp[self._lineNoPrefix+str(self._lineNo)]=substitution
         self._addLine(fitchNewLine,naturalNewLine,theoryNewLine,basicNewLine)           
         return substitution 
-    def rsub(self,equation='',subinto='',*inputs,**pars):
-        if self._theme=="language":
-            return T(T)
-        name=""
-        if "name" in pars:
-            name=pars["name"]  
-        if self._pos==len(self._stat):
-            return False
-        substitution=_state(self._context+self._stat.relativeComponents(self._pos,self._pos)).substitute(equation,subinto,[x for x in inputs])
-        if self._logic!="propositional":
-            substitution=_renameNonContTokens(self._context+self._stat.relativeComponents(self._pos,self._pos),substitution)        
-        substitutionNatural=substitution.natural(self._logic,self._dialect)
-        self._lines.append(substitution)
-        self._stat=exp(self._stat[:self._pos]+_im+substitution+self._stat[self._pos:])
-        self._pos=self._pos+len(substitution)+len(_as)
-        fitchNewLine=self._space+self._prefix+_il+self._space+substitutionNatural+self._no(name)
-        naturalNewLine=self._substitutionPhrase()+substitutionNatural+self._no(name,True)+_par["period"]
-        theoryNewLine=_newParagraph()+"Theorem"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+substitutionNatural+_par["period"]
-        basicNewLine=_newParagraph()+"Conclusion"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+substitutionNatural+_par["period"]
-        fitchNewLine=fitchNewLine+_newLine()
-        _Exp[self._lineNoPrefix+str(self._lineNo)]=substitution
-        self._addLine(fitchNewLine,naturalNewLine,theoryNewLine,basicNewLine)           
-        return substitution 
-    def lsub(self,equation='',subinto='',*inputs,**pars):
-        if self._theme=="language":
-            return T(T)
-        name=""
-        if "name" in pars:
-            name=pars["name"]  
-        if self._pos==len(self._stat):
-            return False
-        substitution=_state(self._context+self._stat.relativeComponents(self._pos,self._pos)).substitute(equation,subinto,[x for x in inputs],False)        
-        if self._logic!="propositional":
-            substitution=_renameNonContTokens(self._context+self._stat.relativeComponents(self._pos,self._pos),substitution)        
-        substitutionNatural=substitution.natural(self._logic,self._dialect)
-        self._lines.append(substitution)
-        self._stat=exp(self._stat[:self._pos]+_im+substitution+self._stat[self._pos:])
-        self._pos=self._pos+len(substitution)+len(_as)
-        fitchNewLine=self._space+self._prefix+_il+self._space+substitutionNatural+self._no(name)
-        naturalNewLine=self._substitutionPhrase()+substitutionNatural+self._no(name,True)+_par["period"]
-        theoryNewLine=_newParagraph()+"Theorem"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+substitutionNatural+_par["period"]
-        basicNewLine=_newParagraph()+"Conclusion"+self._no(name)+_par["period"]+self._label+_newLine()+_par["space"]+substitutionNatural+_par["period"]
-        fitchNewLine=fitchNewLine+_newLine()
-        _Exp[self._lineNoPrefix+str(self._lineNo)]=substitution
-        self._addLine(fitchNewLine,naturalNewLine,theoryNewLine,basicNewLine)           
-        return substitution 
-    def derive(self,expr='',r=0):
-        if self._theme=="language":
-            return T(T)
-        comp=self._context+self._stat.relativeComponents(self._pos,self._pos)
-        deduction=[]
-        deductionArity=[]
-        equationLHS=[]
-        equationRHS=[]
-        equation=[]
-        for c in comp:
-            if decomposeFor(c)[0]==[_im] and len(decomposeFor(c)[1])==2:
-                deduction.append(c)
-                deductionArity.append(len([v for v in contextVars(decomposeFor(c)[1][0]) if v not in contextVars(self)]))
-            elif ((decomposeFor(c)[0]==[_eq] or decomposeFor(c)[0]==[" "+_eq+" "])) and len(decomposeFor(c)[1])==2 and isValue(decomposeFor(c)[1][0])==True and isValue(decomposeFor(c)[1][1])==True:
-                equation.append(c)
-                equationLHS.append(decomposeFor(c)[1][0])
-                equationRHS.append(decomposeFor(c)[1][1])
-        #var=contextVars(_state(comp))
-        if r>len(comp) or r==0:
-            r=len(comp)
-        latestComp=[comp[i] for i in range(len(comp)-r,len(comp))]
-        for i in range(0,len(deduction)): 
-            concs=list(product(*tuple([latestComp for j in range(0,deductionArity[i])])))
-            for t in concs:
-                application=_state(comp).apply(deduction[i],*t)
-                if T(application)==T(expr):
-                    A=self._apply(deduction[i],*t)
-                    return A
-        for i in range(0,len(equationLHS)): 
-            for j in range(0,len(comp)):
-                s=comp[j].count(equationLHS[i])
-                if s>0:
-                    if s>1:
-                        positions=list(product(*tuple([[-1]+[w for w in range(1,s+1)] for z in range(1,s+1)])))
-                    elif s==1:    
-                        positions=[(1,)]
-                    for k in range(0,len(positions)):
-                        substitution=_state(comp).substitute(equation[i],_state(comp[j]),list(positions[k]))
-                        if T(substitution)==T(expr):
-                            A=self.rsub(equation[i],_state(comp[j]),*positions[k])
-                            return A
-                else:
-                    continue
-        for i in range(0,len(equationRHS)): 
-            for j in range(0,len(comp)):
-                s=comp[j].count(equationRHS[i])
-                if s>0:
-                    if s>1:
-                        positions=list(product(*tuple([[-1]+[w for w in range(1,s+1)] for z in range(1,s+1)])))
-                    elif s==1:    
-                        positions=[(1,)]
-                    for k in range(0,len(positions)):
-                        substitution=_state(comp).substitute(equation[i],_state(comp[j]),list(positions[k]),False)
-                        if T(substitution)==T(expr):
-                            A=self.lsub(equation[i],_state(comp[j]),list(positions[k]))
-                            return A    
-                else:
-                    continue
-    def op(self):
-        if self._pos==len(self._stat):
-            return False
-        self._stat=exp(self._stat[:self._pos]+_im+_lb+_im+_rb+self._stat[self._pos:])
-        self._pos=self._pos+len(_lb)+len(_im)+len(_im)
-        self._prefix=self._prefix+_il
-        fitchNewLine=self._space+self._prefix+_al+self._space+self._startArgument+self._no()
-        naturalNewLine=_newParagraph()+' Starting a new subargument'+self._no("",True)+_par["period"]
-        self._fitch=self._fitch+self._newLine+fitchNewLine
-        self._natural=self._natural+naturalNewLine
-        if self._theme=="fitch":
-            print(fitchNewLine)
-        elif self._theme=="natural":
-            print(naturalNewLine, end="")    
-        self._lineNo=self._lineNo+1
-        self._lines.append(TRUTH)
-        return
     def end(self,*conclusions):
         if self._theme=="language":
-            return T(T)
+            return N(N)
         if self._pos==len(self._stat):
-            return T
+            return N
         d=0
         i=self._pos
         assStartPos=[]
@@ -3135,7 +2723,7 @@ class argument():
                 conList=conList+components(self._stat[conStartPos[i]:conEndPos[i]])
         proof=_state(conList)
         if len(conStartPos)<1:
-            statement=TRUTH
+            statement=NN
         else:
             statement=_state(components(self._stat[conStartPos[0]:conEndPos[0]]))
         for cons in conclusions:
@@ -3144,14 +2732,13 @@ class argument():
                     statement=statement+_state([con])
         proposition=_state(self._context+self._stat.relativeComponents(i,i)).proposition(assumption,proof,statement)
         propositionNatural=proposition.natural(self._logic,self._dialect)
-        propositionConclusion=components(proposition)        
         prop=components(proposition)[0]
         if isInf(prop):
             dec=decomposeFor(components(proposition)[0])
             propositionConclusionNatural=exp(dec[1][1]).natural(self._logic,self._dialect)
         else:
             propositionConclusionNatural=prop.natural(self._logic,self._dialect)
-        self._lines.append(TRUTH)
+        self._lines.append(NN)
         self._lines.append(proposition)
         if self._pos<len(self._stat)-1:
             fitchNewLine=_newLine()+self._space+self._prefix+_cl+self._space+self._endArgument+self._newLine+self._space+self._prefix+self._space+propositionNatural
@@ -3171,49 +2758,3 @@ class argument():
             self._addLine(fitchNewLine,naturalNewLine,theoryNewLine,basicNewLine)    
             self._lineNo=self._lineNo+1
         return proposition
-    
-class core(argument):
-    def __init__(self, superArgument=[], **pars):
-        super().__init__(superArgument=[], **pars)
-
-        self._c = self.assume("!", name="constant generator")
-        self._truth = self.assume("true[]", name="truth token")
-        self.truth = self._truth(self._c)
-        #note(self.truth, self.truth.natural(), 'abbreviation for truth statement')
-        self.truthIntro = self.assume(self._truth(self._c), name="truth introduction")        
-        self.restate = self.assume(DEDUCE('X','X'), name="restate")
-
-class heyting(core):
-    def __init__(self, superArgument=[], **pars):
-        super().__init__(superArgument=[], **pars)
-
-        self._False = self.assume('false[]', name="fallacy token")
-        self.false = self._False(self._c)
-        #note(self.false, self.false.natural(), 'abbreviation for fallacy statement')
-        self.neg = DEDUCE('',self.false)
-        #note(self.neg, self.neg.natural(), 'abbreviation for negation')
-        self.falseElim = self.assume(DEDUCE(('X',self.false),'X'), name="fallacy elimination")
-        self._Or = self.assume('[] ? []', name="disjunction token")
-        
-        self.disIntro = self.assume(DEDUCE(('X','Y','Z',DEDUCE('X','Z'),DEDUCE('Y','Z')),DEDUCE(self._Or('X','Y'),'Z')), name="disjunction introduction")
-        self.disjElim = self.assume(DEDUCE(('X','Y'),(DEDUCE('X',self._Or('X','Y')),DEDUCE('Y',self._Or('X','Y')))),name="disjunction elimination")
-
-class boolean(heyting):
-    def __init__(self, superArgument=[], **pars):
-        super().__init__(superArgument=[], **pars)
-
-        self.excludedMiddle = self.assume(DEDUCE(('X',self.neg(self.neg('X'))),'X'))
-        
-class peano(boolean):
-    def __init__(self, superArgument=[], **pars):
-        super().__init__(superArgument=[], **pars)
-        
-        self._Nat = self.assume('[] nat', name="number token")
-        self._Zero = self.assume('0', name="number zero token")
-        self.zero = self.assume(self._Nat(self._Zero), name="zero")
-        self._Suc = self.assume('[]+1', name="successor token")
-        self.suc = self.assume(DEDUCE(('X',self._Nat('X')),self._Nat(self._Suc('X'))), name="successor")
-        self.peano1 = self.assume(DEDUCE('X',self.neg(EQUALS(self._Suc('X'),self._Zero))), name='first peano')        
-        self.peano2 = self.assume(DEDUCE(('X','Y',EQUALS(self._Suc('X'),self._Suc('Y'))),EQUALS('X','Y')), name='second peano')
-        X=exp('X([])')
-        self.peano3 = self.assume(DEDUCE((X,X(self._Zero),DEDUCE(('n',self._Nat('n'),X('n')),X(self._Suc('n')))),DEDUCE(('n',self._Nat('n')),X('n'))), name='third peano')
